@@ -4,9 +4,71 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BatchExecute"
+		xmlns:p="clr-namespace:BatchExecute.Properties" 
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+	    Height="{Binding Source={x:Static p:Settings.Default}, Path=Height, Mode=TwoWay}"
+	    Width="{Binding Source={x:Static p:Settings.Default}, Path=Width, Mode=TwoWay}"
+		Left="{Binding Source={x:Static p:Settings.Default}, Path=Left, Mode=TwoWay}"
+		Top="{Binding Source={x:Static p:Settings.Default}, Path=Top, Mode=TwoWay}"
+		Title="MainWindow" Closing="Window_Closing">
+	<Window.Resources>
+		<Style x:Key="{x:Static ToolBar.CheckBoxStyleKey}" TargetType="CheckBox">
+			<Setter Property="Margin" Value="5,0"/>
+		</Style>
+	</Window.Resources>
+	<DockPanel>
+		<ToolBarTray DockPanel.Dock="Top">
+			<ToolBar DockPanel.Dock="Top">
+				<CheckBox>Run Batch</CheckBox>
+				<CheckBox>Detect Idle</CheckBox>
+				<CheckBox>Close Finished</CheckBox>
+				<ComboBox SelectedIndex="{Binding Source={x:Static p:Settings.Default}, 
+					Path=WindowStyle, Mode=TwoWay}" ItemsSource="{Binding WindowStyles}"/>
+			</ToolBar>
+		</ToolBarTray>
+		<Grid>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*" />
+				<RowDefinition Height="10" />
+				<RowDefinition Height="*" />
+			</Grid.RowDefinitions>
+			<Grid Grid.Row="0">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="20" />
+					<RowDefinition Height="*" />
+				</Grid.RowDefinitions>
+				<StackPanel Grid.Row="0" Orientation="Horizontal">
+					<Button Click="ClearBatchFiles">Clear</Button>
+				</StackPanel>
+				<ListBox Grid.Row="1" ItemsSource="{Binding BatchFiles}" AllowDrop="True" Drop="File_Drop">
+					<ListBox.ItemTemplate>
+						<DataTemplate>
+							<StackPanel Orientation="Horizontal">
+								<TextBlock Text="{Binding}" />
+							</StackPanel>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
+			</Grid>
+			<GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+			<Grid Grid.Row="2">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="20" />
+					<RowDefinition Height="*" />
+				</Grid.RowDefinitions>
+				<StackPanel Grid.Row="0" Orientation="Horizontal">
+					<Button Click="ClearDoneBatchFiles">Clear</Button>
+				</StackPanel>
+				<ListBox Grid.Row="1" ItemsSource="{Binding DoneBatchFiles}">
+					<ListBox.ItemTemplate>
+						<DataTemplate>
+							<StackPanel Orientation="Horizontal">
+								<TextBlock Text="{Binding}" />
+							</StackPanel>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
+			</Grid>
+		</Grid>
+	</DockPanel>
 </Window>
