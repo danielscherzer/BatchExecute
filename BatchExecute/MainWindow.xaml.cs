@@ -1,8 +1,6 @@
-﻿using BatchExecute.Properties;
-using System;
-using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace BatchExecute
 {
@@ -14,36 +12,41 @@ namespace BatchExecute
 		public MainWindow()
 		{
 			InitializeComponent();
-			DataContext = this;
-			BatchFiles = new ObservableCollection<string>(Settings.Default.BatchFiles.Cast<string>());
-			DoneBatchFiles = new ObservableCollection<string>(Settings.Default.DoneBatchFiles.Cast<string>());
-			WindowStyles = new ObservableCollection<string>(Enum.GetNames(typeof(ProcessRun.ProcessWindowStyle)));
+			viewModel = new BatchExecuteViewModel();
+			DataContext = viewModel;
 		}
 
-		public ObservableCollection<string> BatchFiles { get; }
-		public ObservableCollection<string> DoneBatchFiles { get; }
-		public ObservableCollection<string> WindowStyles { get; }
+		private BatchExecuteViewModel viewModel;
 
-		private void ClearBatchFiles(object sender, RoutedEventArgs e) => BatchFiles.Clear();
+		private void ClearBatchFiles(object sender, RoutedEventArgs e) => viewModel.BatchFiles.Clear();
 
-		private void ClearDoneBatchFiles(object sender, RoutedEventArgs e) => DoneBatchFiles.Clear();
+		private void ClearDoneBatchFiles(object sender, RoutedEventArgs e) => viewModel.DoneBatchFiles.Clear();
 
 		private void File_Drop(object sender, DragEventArgs e)
 		{
 			var fileNames = (string[])e.Data.GetData(DataFormats.FileDrop);
 			foreach (var fileName in fileNames)
 			{
-				BatchFiles.Add(fileName);
+				viewModel.BatchFiles.Add(fileName);
 			}
 		}
 
-		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) => viewModel.Save();
+
+		private void Redo(object sender, RoutedEventArgs e) => viewModel.Redo();
+
+		private async void RunBatches(object sender, RoutedEventArgs e)
 		{
-			Settings.Default.BatchFiles = new System.Collections.Specialized.StringCollection();
-			Settings.Default.BatchFiles.AddRange(BatchFiles.ToArray());
-			Settings.Default.DoneBatchFiles = new System.Collections.Specialized.StringCollection();
-			Settings.Default.DoneBatchFiles.AddRange(DoneBatchFiles.ToArray());
-			Settings.Default.Save();
+			await viewModel.ExecuteBatchesAsync();
+		}
+
+		private void StopBatches(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void IsolatePar2(object sender, RoutedEventArgs e)
+		{
 		}
 	}
 }

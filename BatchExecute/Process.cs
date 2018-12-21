@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Management;
 using System.Runtime.InteropServices;
 
@@ -46,34 +47,22 @@ namespace BatchExecute
 			return output;
 		}
 
-		public static long ChildrenTotalProcessorTime(int id)
-		{
-			long ticks = 0;
-			var children = GetChildProcesses(id);
-			foreach (Process p in children)
-			{
-				ticks += p.TotalProcessorTime.Ticks;
-			}
-			return ticks;
-		}
-
 		public static void Run(string fileName_, ProcessWindowStyle ws_)
 		{
 			try
 			{
-				Process process = Start(fileName_, ws_);
-				process.Close();
+				using (var process = Start(fileName_, ws_))
+				{ }
 			}
 			catch (Exception)
 			{ }
 		}
 
-		public static void RunAndWait(string fileName_, int iIdleTimeBeforeCloseMsec_, bool bCloseOnIdle_
-			, ProcessWindowStyle ws_)
+		public static void RunAndWait(string fileName_, int iIdleTimeBeforeCloseMsec_
+			, bool bCloseOnIdle_, ProcessWindowStyle ws_)
 		{
-			try
+			using (var process = Start(fileName_, ws_))
 			{
-				Process process = Start(fileName_, ws_);
 				if (1 > iIdleTimeBeforeCloseMsec_)
 				{
 					//wait indefinitely for process exit
@@ -81,57 +70,46 @@ namespace BatchExecute
 				}
 				else
 				{
-					process.Refresh();
-					long lastTickCount = CurrentProcessTreeTicks(process);
-					//polling if process did anything
-					const int pollingInterval = 100;
-					int idleTime = 0;
-					while (!process.WaitForExit(pollingInterval))
+					WaitForIdleTime(process, iIdleTimeBeforeCloseMsec_);
+					//has been idle for longer than parameter idle time
+					if (bCloseOnIdle_)
 					{
-						//process still running after iWaitTime
-						process.Refresh();
-						//check if no processing has been done (any cpu ticks used) during polling interval
-						long tickCount = CurrentProcessTreeTicks(process);
-						if (tickCount == lastTickCount)
+						//try to gracefully end process
+						process.CloseMainWindow();
+						if (!process.WaitForExit(1000))
 						{
-							//process was idle during polling interval -> add to idle time
-							idleTime += pollingInterval;
-							if (idleTime > iIdleTimeBeforeCloseMsec_)
-							{
-								//has been idle for longer than parameter idle time
-								if (bCloseOnIdle_)
-								{
-									//try to gracefully end process
-									process.CloseMainWindow();
-									if (!process.WaitForExit(1000))
-									{
-										process.Kill();
-										process.WaitForExit(); //wait indefinitely otherwise old processes keep hanging around
-									}
-								}
-								//stop waiting for process -> return and let process be on it's own
-								break;
-							}
+							process.Kill();
+							process.WaitForExit(); //wait indefinitely otherwise old processes keep hanging around
 						}
-						else
-						{
-							//not idle during polling interval -> no idle time
-							idleTime = 0;
-						}
-						lastTickCount = CurrentProcessTreeTicks(process);
 					}
-					process.Close();
 				}
 			}
-			catch (Exception)
-			{ }
 		}
 
-		private static long CurrentProcessTreeTicks(Process process)
+		private static void WaitForIdleTime(Process process, int idleTimeBeforeCloseMsec)
 		{
-			long i = process.TotalProcessorTime.Ticks + ChildrenTotalProcessorTime(process.Id);
-			//Console.WriteLine(i);
-			return i;
+			var processTree = GetChildProcesses(process.Id);
+			processTree.Add(process);
+			long TotalTicks()
+			{
+				processTree.ForEach((p) => p.Refresh());
+				return processTree.Sum((p) => p.TotalProcessorTime.Ticks);
+			}
+			//polling if process did anything
+			const int pollingInterval = 100;
+			long lastTickCount = TotalTicks();
+			for (int idleTime = 0; idleTime < idleTimeBeforeCloseMsec; idleTime += pollingInterval)
+			{
+				if (process.WaitForExit(pollingInterval)) return;
+				var newTickCount = TotalTicks();
+				//check if some processing has been done (any cpu ticks used) during polling interval
+				if (newTickCount != lastTickCount)
+				{
+					//not idle during polling interval -> reset idle time
+					idleTime = 0;
+					lastTickCount = newTickCount;
+				}
+			}
 		}
 
 		private static int GetParentProcess(int id)
