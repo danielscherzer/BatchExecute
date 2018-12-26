@@ -2,12 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace BatchExecute
 {
-	class BatchExecuteViewModel
+	class BatchExecuteViewModel : INotifyPropertyChanged
 	{
 		public BatchExecuteViewModel()
 		{
@@ -18,6 +19,18 @@ namespace BatchExecute
 
 		public ObservableCollection<string> BatchFiles { get; }
 		public ObservableCollection<string> DoneBatchFiles { get; }
+		public bool Run
+		{
+			get => running;
+			private set
+			{
+				running = value;
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Run)));
+			}
+		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
+
 		public IEnumerable<ProcessRun.ProcessWindowStyle> WindowStyles { get; }
 
 		internal void Save()
@@ -38,17 +51,31 @@ namespace BatchExecute
 			DoneBatchFiles.Clear();
 		}
 
-		internal async Task ExecuteBatchesAsync()
+		internal async Task ExecuteBatchAsync()
 		{
+			cancel = false;
+			Run = true;
 			while(BatchFiles.Count > 0)
 			{
-				var batchFile = BatchFiles[0];
-				await Task.Run(() => ProcessRun.RunAndWait(batchFile, 1000, true, BatchWindowStyle));
+				var file = BatchFiles[0];
+				await Task.Run(() =>
+				{
+					var idleTime = Settings.Default.DetectIdle ? Settings.Default.IdleWaitTime : 0;
+					var close = Settings.Default.CloseAfterIdleTime;
+					var ws = (ProcessRun.ProcessWindowStyle)Settings.Default.WindowStyle;
+					ProcessRun.RunAndWait(file, idleTime, close, ws, () => cancel);
+				});
+				if (cancel) break;
 				BatchFiles.RemoveAt(0);
-				DoneBatchFiles.Add(batchFile);
+				DoneBatchFiles.Add(file);
 			}
+			cancel = false;
+			Run = false;
 		}
 
-		private ProcessRun.ProcessWindowStyle BatchWindowStyle => (ProcessRun.ProcessWindowStyle)Settings.Default.WindowStyle;
+		internal void CancelBatch() => cancel = true;
+
+		private volatile bool cancel = false;
+		private bool running = false;
 	}
 }

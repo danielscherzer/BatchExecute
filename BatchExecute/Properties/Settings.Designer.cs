@@ -110,5 +110,41 @@ namespace BatchExecute.Properties {
                 this["WindowStyle"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
+        public int IdleWaitTime {
+            get {
+                return ((int)(this["IdleWaitTime"]));
+            }
+            set {
+                this["IdleWaitTime"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool CloseAfterIdleTime {
+            get {
+                return ((bool)(this["CloseAfterIdleTime"]));
+            }
+            set {
+                this["CloseAfterIdleTime"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool DetectIdle {
+            get {
+                return ((bool)(this["DetectIdle"]));
+            }
+            set {
+                this["DetectIdle"] = value;
+            }
+        }
     }
 }

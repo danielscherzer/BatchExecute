@@ -1,16 +1,19 @@
 ﻿<Window x:Class="BatchExecute.MainWindow"
-		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-		xmlns:local="clr-namespace:BatchExecute"
-		xmlns:p="clr-namespace:BatchExecute.Properties" 
-		mc:Ignorable="d"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:p="clr-namespace:BatchExecute.Properties"
+        mc:Ignorable="d"
 		Height="{Binding Source={x:Static p:Settings.Default}, Path=Height, Mode=TwoWay}"
 		Width="{Binding Source={x:Static p:Settings.Default}, Path=Width, Mode=TwoWay}"
 		Left="{Binding Source={x:Static p:Settings.Default}, Path=Left, Mode=TwoWay}"
 		Top="{Binding Source={x:Static p:Settings.Default}, Path=Top, Mode=TwoWay}"
-		Title="MainWindow" Closing="Window_Closing">
+		Title="MainWindow" Closing="Window_Closing" FocusManager.FocusedElement="{Binding ElementName=batchList}">
+	<Window.CommandBindings>
+		<CommandBinding Command="Paste" Executed="PasteCommand_Executed" CanExecute="PasteCommand_CanExecute" />
+		<CommandBinding Command="Cut" Executed="CutCommand_Executed" CanExecute="CutCommand_CanExecute" />
+	</Window.CommandBindings>
 	<Window.Resources>
 		<Style x:Key="{x:Static ToolBar.CheckBoxStyleKey}" TargetType="CheckBox">
 			<Setter Property="Margin" Value="5,0"/>
@@ -24,11 +27,24 @@
 	</Window.Resources>
 	<DockPanel>
 		<ToolBar DockPanel.Dock="Top">
-			<CheckBox Checked="RunBatches" Unchecked="StopBatches">Run Batches</CheckBox>
-			<CheckBox>Detect Idle</CheckBox>
-			<CheckBox>Close Finished</CheckBox>
+			<CheckBox IsChecked="{Binding Run, Mode=OneWay}" Checked="Run" Unchecked="Stop">Run</CheckBox>
+			<Label >Window Style:</Label>
 			<ComboBox SelectedIndex="{Binding Source={x:Static p:Settings.Default}, 
 				Path=WindowStyle, Mode=TwoWay}" ItemsSource="{Binding WindowStyles}"/>
+			<Separator/>
+			<Button Command="ApplicationCommands.Cut">Cut</Button>
+			<Button Command="ApplicationCommands.Paste">Paste</Button>
+			<Separator/>
+			<CheckBox Name="detectIdle" IsChecked="{Binding Source={x:Static p:Settings.Default}, 
+				Path=DetectIdle, Mode=TwoWay}">Detect Idle</CheckBox>
+			<Label IsEnabled="{Binding Path=IsChecked, ElementName=detectIdle}">Idle Time:</Label>
+			<TextBox IsEnabled="{Binding Path=IsChecked, ElementName=detectIdle}"
+				Text="{Binding Source={x:Static p:Settings.Default}, 
+				Path=IdleWaitTime, Mode=TwoWay}"></TextBox>
+			<CheckBox IsEnabled="{Binding Path=IsChecked, ElementName=detectIdle}"
+				IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=CloseAfterIdleTime, Mode=TwoWay}">
+				Close Idle
+			</CheckBox>
 		</ToolBar>
 		<Grid>
 			<Grid.ColumnDefinitions>
@@ -38,13 +54,12 @@
 			</Grid.ColumnDefinitions>
 			<DockPanel Grid.Column="0">
 				<ToolBar DockPanel.Dock="Top">
-					<Button Click="ClearBatchFiles">Clear Batches</Button>
+					<Button Click="ClearBatchFiles">Clear Batch</Button>
 					<Button Click="IsolatePar2">Isolate to Par2</Button>
-					<Button Command="ApplicationCommands.Copy">Copy</Button>
-					<Button Command="ApplicationCommands.Cut">_Cut</Button>
-					<Button Command="ApplicationCommands.Paste">_Paste</Button>
+					<!--<Button Command="ApplicationCommands.Paste">Paste</Button>-->
 				</ToolBar>
-				<ListBox Name="batchList" SelectionMode="Extended" ItemsSource="{Binding BatchFiles}" AllowDrop="True" Drop="File_Drop">
+				<ListBox Name="batchList" AllowDrop="True" SelectionMode="Extended"
+						 ItemsSource="{Binding BatchFiles}" Drop="File_Drop">
 					<ListBox.ItemTemplate>
 						<DataTemplate>
 							<TextBlock Text="{Binding}"/>
@@ -58,7 +73,7 @@
 					<Button Click="Redo">Redo</Button>
 					<Button Click="ClearDoneBatchFiles">Clear Done</Button>
 				</ToolBar>
-				<ListBox Grid.Row="1" ItemsSource="{Binding DoneBatchFiles}">
+				<ListBox Grid.Row="1" SelectionMode="Extended" ItemsSource="{Binding DoneBatchFiles}">
 					<ListBox.ItemTemplate>
 						<DataTemplate>
 							<StackPanel Orientation="Horizontal">

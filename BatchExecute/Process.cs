@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Management;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace BatchExecute
 {
@@ -58,57 +59,57 @@ namespace BatchExecute
 			{ }
 		}
 
-		public static void RunAndWait(string fileName_, int iIdleTimeBeforeCloseMsec_
-			, bool bCloseOnIdle_, ProcessWindowStyle ws_)
+		public static void RunAndWait(string fileName, int idleTimeMsec
+			, bool closeAfterIdleTime, ProcessWindowStyle ws, Func<bool> cancel)
 		{
-			using (var process = Start(fileName_, ws_))
+			using (var process = Start(fileName, ws))
 			{
-				if (1 > iIdleTimeBeforeCloseMsec_)
+				if (1 > idleTimeMsec)
 				{
 					//wait indefinitely for process exit
 					process.WaitForExit();
 				}
 				else
 				{
-					WaitForIdleTime(process, iIdleTimeBeforeCloseMsec_);
+					WaitForIdleTime(process, idleTimeMsec, cancel);
 					//has been idle for longer than parameter idle time
-					if (bCloseOnIdle_)
+					if (closeAfterIdleTime)
 					{
 						//try to gracefully end process
-						process.CloseMainWindow();
-						if (!process.WaitForExit(1000))
+						if(!process.CloseMainWindow())
 						{
 							process.Kill();
-							process.WaitForExit(); //wait indefinitely otherwise old processes keep hanging around
 						}
 					}
 				}
 			}
 		}
 
-		private static void WaitForIdleTime(Process process, int idleTimeBeforeCloseMsec)
+		private static void WaitForIdleTime(Process process, int idleTimeMsec, Func<bool> cancel)
 		{
 			var processTree = GetChildProcesses(process.Id);
 			processTree.Add(process);
 			long TotalTicks()
 			{
 				processTree.ForEach((p) => p.Refresh());
-				return processTree.Sum((p) => p.TotalProcessorTime.Ticks);
+				return processTree.Sum((p) => p.HasExited ? 0 : p.TotalProcessorTime.Ticks);
 			}
 			//polling if process did anything
 			const int pollingInterval = 100;
-			long lastTickCount = TotalTicks();
-			for (int idleTime = 0; idleTime < idleTimeBeforeCloseMsec; idleTime += pollingInterval)
+			long lastTickCount = 0;
+			for (int idleTime = 0; idleTime < idleTimeMsec; idleTime += pollingInterval)
 			{
-				if (process.WaitForExit(pollingInterval)) return;
 				var newTickCount = TotalTicks();
+				//Debug.WriteLine(newTickCount);
 				//check if some processing has been done (any cpu ticks used) during polling interval
-				if (newTickCount != lastTickCount)
+				if (newTickCount > lastTickCount)
 				{
 					//not idle during polling interval -> reset idle time
 					idleTime = 0;
 					lastTickCount = newTickCount;
 				}
+				if (process.WaitForExit(pollingInterval)) return;
+				if (cancel != null) { if (cancel.Invoke()) return; }
 			}
 		}
 
