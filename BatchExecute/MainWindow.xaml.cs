@@ -100,6 +100,15 @@ namespace BatchExecute
 
 		private void IsolatePar2(object sender, RoutedEventArgs e)
 		{
+			batchList.Select(".par2");
+			batchList.In
+		}
+
+		private void Selection_TextChanged(object sender, TextChangedEventArgs e)
+		{
+			var textBox = sender as TextBox;
+			if (textBox is null) return;
+			batchList.Select(textBox.Text);
 		}
 	}
 }

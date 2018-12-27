@@ -23,18 +23,23 @@ namespace BatchExecute
 		//	}
 		//}
 
-		//public static void InvertSelection(this ListBox listBox)
-		//{
-		//	if (listBox is null) return;
-		//	for (int i = 0; i < listBox.Items.Count; ++i)
-		//	{
-		//		bool selected = listBox.GetSelected(i);
-		//		listBox.SetSelected(i, !selected);
-		//	}
-		//}
+		public static void InvertSelection(this ListBox listBox)
+		{
+			if (listBox is null) return;
+			var selected = new HashSet<object>(listBox.SelectedItems.Cast<string>());
+			listBox.SelectedItems.Clear();
+			foreach(var item in listBox.Items)
+			{
+				if(!selected.Contains(item))
+				{
+					listBox.SelectedItems.Add(item);
+				}
+			}
+		}
 
 		public static void Select(this ListBox listBox, string sSelect)
 		{
+			if (listBox is null) return;
 			listBox.SelectedItems.Clear();
 			foreach(var item in listBox.Items)
 			{

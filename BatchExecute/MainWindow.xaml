@@ -28,7 +28,7 @@
 	<DockPanel>
 		<ToolBar DockPanel.Dock="Top">
 			<CheckBox IsChecked="{Binding Run, Mode=OneWay}" Checked="Run" Unchecked="Stop">Run</CheckBox>
-			<Label >Window Style:</Label>
+			<Label>Window Style:</Label>
 			<ComboBox SelectedIndex="{Binding Source={x:Static p:Settings.Default}, 
 				Path=WindowStyle, Mode=TwoWay}" ItemsSource="{Binding WindowStyles}"/>
 			<Separator/>
@@ -56,13 +56,20 @@
 				<ToolBar DockPanel.Dock="Top">
 					<Button Click="ClearBatchFiles">Clear Batch</Button>
 					<Button Click="IsolatePar2">Isolate to Par2</Button>
-					<!--<Button Command="ApplicationCommands.Paste">Paste</Button>-->
+					<Separator/>
+					<Label>Select:</Label>
+					<TextBox TextChanged="Selection_TextChanged" Margin="0" MinWidth="100"/>
+					<Separator/>
+					<Label>Count:</Label>
+					<Label Content="{Binding BatchFiles.Count, Mode=OneWay}"/>
 				</ToolBar>
-				<ListBox Name="batchList" AllowDrop="True" SelectionMode="Extended"
-						 ItemsSource="{Binding BatchFiles}" Drop="File_Drop">
+				<ListBox Name="batchList" AllowDrop="True" SelectionMode="Extended" Drop="File_Drop"
+						 ItemsSource="{Binding BatchFiles}">
 					<ListBox.ItemTemplate>
 						<DataTemplate>
-							<TextBlock Text="{Binding}"/>
+							<StackPanel Orientation="Horizontal">
+								<TextBlock Text="{Binding}" />
+							</StackPanel>
 						</DataTemplate>
 					</ListBox.ItemTemplate>
 				</ListBox>
