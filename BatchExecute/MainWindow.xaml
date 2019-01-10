@@ -4,48 +4,95 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:p="clr-namespace:BatchExecute.Properties"
+        xmlns:self="clr-namespace:BatchExecute"
         mc:Ignorable="d"
 		Height="{Binding Source={x:Static p:Settings.Default}, Path=Height, Mode=TwoWay}"
 		Width="{Binding Source={x:Static p:Settings.Default}, Path=Width, Mode=TwoWay}"
 		Left="{Binding Source={x:Static p:Settings.Default}, Path=Left, Mode=TwoWay}"
 		Top="{Binding Source={x:Static p:Settings.Default}, Path=Top, Mode=TwoWay}"
-		Title="MainWindow" Closing="Window_Closing" FocusManager.FocusedElement="{Binding ElementName=batchList}">
+		Title="Batch Execute" Closing="Window_Closing" Icon="/BatchExecute;component/Images/runPerformance.png"
+		FocusManager.FocusedElement="{Binding ElementName=batchList}">
 	<Window.CommandBindings>
+		<CommandBinding Command="Cut" Executed="CutCommand_Executed" CanExecute="IsSomethingSelected" />
+		<CommandBinding Command="Open" Executed="OpenCommand_Executed" CanExecute="IsSomethingSelected" />
 		<CommandBinding Command="Paste" Executed="PasteCommand_Executed" CanExecute="PasteCommand_CanExecute" />
-		<CommandBinding Command="Cut" Executed="CutCommand_Executed" CanExecute="CutCommand_CanExecute" />
+		<CommandBinding Command="self:CustomCommands.RunAll" Executed="RunAllCommand_Executed" CanExecute="IsSomethingSelected" />
 	</Window.CommandBindings>
+	<Window.InputBindings>
+		<!--<KeyBinding Gesture="F5" Command="{Binding ApplicationCommands.Open}"/>-->
+	</Window.InputBindings>
 	<Window.Resources>
-		<Style x:Key="{x:Static ToolBar.CheckBoxStyleKey}" TargetType="CheckBox">
+		<!--<Style x:Key="{x:Static ToolBar.CheckBoxStyleKey}" TargetType="CheckBox">
 			<Setter Property="Margin" Value="5,0"/>
 		</Style>
 		<Style x:Key="{x:Static ToolBar.ButtonStyleKey}" TargetType="Button">
 			<Setter Property="Margin" Value="5,0"/>
-		</Style>
-		<Style TargetType="ToolBar">
-			<Setter Property="ToolBarTray.IsLocked" Value="True"/>
+		</Style>-->
+		<Style TargetType="Image">
+			<Setter Property="Width" Value="16"/>
+			<Setter Property="Height" Value="16"/>
+			<Setter Property="RenderOptions.BitmapScalingMode" Value="Fant"/>
+			<Style.Triggers>
+				<Trigger Property="IsEnabled" Value="False">
+					<Setter Property="Opacity" Value="0.5" />
+				</Trigger>
+			</Style.Triggers>
 		</Style>
 	</Window.Resources>
 	<DockPanel>
-		<ToolBar DockPanel.Dock="Top">
-			<CheckBox IsChecked="{Binding Run, Mode=OneWay}" Checked="Run" Unchecked="Stop">Run</CheckBox>
-			<Label>Window Style:</Label>
-			<ComboBox SelectedIndex="{Binding Source={x:Static p:Settings.Default}, 
+		<ToolBarTray DockPanel.Dock="Top">
+			<ToolBar>
+				<ToggleButton Name="run"  IsChecked="{Binding Run, Mode=OneWay}" Checked="Run" Unchecked="Stop">
+					<Image>
+						<Image.Style>
+							<Style TargetType="{x:Type Image}" BasedOn="{StaticResource {x:Type Image}}">
+								<Setter Property="Source" Value="/BatchExecute;component/Images/runPerformance.png" />
+								<Style.Triggers>
+									<DataTrigger Binding="{Binding ElementName=run, Path=IsChecked}" Value="True">
+										<Setter Property="Source" Value="/BatchExecute;component/Images/stop.png" />
+									</DataTrigger>
+								</Style.Triggers>
+							</Style>
+						</Image.Style>
+					</Image>
+				</ToggleButton>
+				<Label>Window Style:</Label>
+				<ComboBox SelectedIndex="{Binding Source={x:Static p:Settings.Default}, 
 				Path=WindowStyle, Mode=TwoWay}" ItemsSource="{Binding WindowStyles}"/>
-			<Separator/>
-			<Button Command="ApplicationCommands.Cut">Cut</Button>
-			<Button Command="ApplicationCommands.Paste">Paste</Button>
-			<Separator/>
-			<CheckBox Name="detectIdle" IsChecked="{Binding Source={x:Static p:Settings.Default}, 
+				<Separator/>
+				<CheckBox Name="detectIdle" IsChecked="{Binding Source={x:Static p:Settings.Default}, 
 				Path=DetectIdle, Mode=TwoWay}">Detect Idle</CheckBox>
-			<Label IsEnabled="{Binding Path=IsChecked, ElementName=detectIdle}">Idle Time:</Label>
-			<TextBox IsEnabled="{Binding Path=IsChecked, ElementName=detectIdle}"
+				<Label IsEnabled="{Binding Path=IsChecked, ElementName=detectIdle}">Idle Time:</Label>
+				<TextBox IsEnabled="{Binding Path=IsChecked, ElementName=detectIdle}"
 				Text="{Binding Source={x:Static p:Settings.Default}, 
 				Path=IdleWaitTime, Mode=TwoWay}"></TextBox>
-			<CheckBox IsEnabled="{Binding Path=IsChecked, ElementName=detectIdle}"
+				<CheckBox IsEnabled="{Binding Path=IsChecked, ElementName=detectIdle}"
 				IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=CloseAfterIdleTime, Mode=TwoWay}">
-				Close Idle
-			</CheckBox>
-		</ToolBar>
+					Close Idle
+				</CheckBox>
+			</ToolBar>
+			<ToolBar>
+				<Button Command="self:CustomCommands.RunAll">
+					<Image Source="/BatchExecute;component/Images/run.png" />
+				</Button>
+				<Button Command="Open">
+					<Image Source="/BatchExecute;component/Images/folderOpened.png" />
+				</Button>
+				<Button Command="Cut">
+					<Image Source="/BatchExecute;component/Images/cut.png" />
+				</Button>
+				<Button Command="Paste">
+					<Image Source="/BatchExecute;component/Images/paste.png" />
+				</Button>
+				<Separator/>
+				<Label>Select:</Label>
+				<TextBox TextChanged="Selection_TextChanged" Margin="0" MinWidth="100"/>
+			</ToolBar>
+		</ToolBarTray>
+		<StatusBar DockPanel.Dock="Bottom">
+			<!--<TextBlock Text="{Binding BatchFiles.Count, Mode=OneWay, StringFormat=Count:{0}}"/>-->
+			<Label Content="{Binding BatchFiles.Count, Mode=OneWay}" ContentStringFormat="Count:{0}"/>
+		</StatusBar>
 		<Grid>
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*" />
@@ -54,14 +101,8 @@
 			</Grid.ColumnDefinitions>
 			<DockPanel Grid.Column="0">
 				<ToolBar DockPanel.Dock="Top">
-					<Button Click="ClearBatchFiles">Clear Batch</Button>
-					<Button Click="IsolatePar2">Isolate to Par2</Button>
-					<Separator/>
-					<Label>Select:</Label>
-					<TextBox TextChanged="Selection_TextChanged" Margin="0" MinWidth="100"/>
-					<Separator/>
-					<Label>Count:</Label>
-					<Label Content="{Binding BatchFiles.Count, Mode=OneWay}"/>
+					<Button Click="ClearBatchFiles">Clear</Button>
+					<Button Click="IsolatePar2">Par2</Button>
 				</ToolBar>
 				<ListBox Name="batchList" AllowDrop="True" SelectionMode="Extended" Drop="File_Drop"
 						 ItemsSource="{Binding BatchFiles}">
@@ -78,7 +119,7 @@
 			<DockPanel Grid.Column="2">
 				<ToolBar DockPanel.Dock="Top">
 					<Button Click="Redo">Redo</Button>
-					<Button Click="ClearDoneBatchFiles">Clear Done</Button>
+					<Button Click="ClearDoneBatchFiles">Clear</Button>
 				</ToolBar>
 				<ListBox Grid.Row="1" SelectionMode="Extended" ItemsSource="{Binding DoneBatchFiles}">
 					<ListBox.ItemTemplate>

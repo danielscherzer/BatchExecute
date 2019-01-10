@@ -19,6 +19,7 @@ namespace BatchExecute
 
 		public ObservableCollection<string> BatchFiles { get; }
 		public ObservableCollection<string> DoneBatchFiles { get; }
+		public ProcessRun.ProcessWindowStyle WindowStyle => (ProcessRun.ProcessWindowStyle)Settings.Default.WindowStyle;
 		public bool Run
 		{
 			get => running;
@@ -62,8 +63,7 @@ namespace BatchExecute
 				{
 					var idleTime = Settings.Default.DetectIdle ? Settings.Default.IdleWaitTime : 0;
 					var close = Settings.Default.CloseAfterIdleTime;
-					var ws = (ProcessRun.ProcessWindowStyle)Settings.Default.WindowStyle;
-					ProcessRun.RunAndWait(file, idleTime, close, ws, () => cancel);
+					ProcessRun.RunAndWait(file, idleTime, close, WindowStyle, () => cancel);
 				});
 				if (cancel) break;
 				BatchFiles.RemoveAt(0);

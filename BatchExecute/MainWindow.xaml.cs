@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,7 +24,7 @@ namespace BatchExecute
 
 		private BatchExecuteViewModel viewModel;
 
-		private void CutCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		private void IsSomethingSelected(object sender, CanExecuteRoutedEventArgs e)
 		{
 			bool CanExecute()
 			{
@@ -71,6 +73,34 @@ namespace BatchExecute
 			}
 		}
 
+		private void OpenCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			var listBox = e.Source as ListBox;
+			if (listBox is null) return;
+			var source = listBox.ItemsSource as IList<string>;
+			if (source is null) return;
+			foreach (var item in listBox.SelectedItems)
+			{
+				string path = Path.GetDirectoryName(item.ToString());
+				if (Directory.Exists(path))
+				{
+					Process.Start("explorer.exe", '"' + path + '"');
+				}
+			}
+		}
+
+		private void RunAllCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			var listBox = e.Source as ListBox;
+			if (listBox is null) return;
+			var source = listBox.ItemsSource as IList<string>;
+			if (source is null) return;
+			foreach (var item in listBox.SelectedItems)
+			{
+				ProcessRun.Run(item.ToString(), viewModel.WindowStyle);
+			}
+		}
+
 		private void ClearBatchFiles(object sender, RoutedEventArgs e) => viewModel.BatchFiles.Clear();
 
 		private void ClearDoneBatchFiles(object sender, RoutedEventArgs e) => viewModel.DoneBatchFiles.Clear();
@@ -88,20 +118,17 @@ namespace BatchExecute
 
 		private void Redo(object sender, RoutedEventArgs e) => viewModel.Redo();
 
-		private async void Run(object sender, RoutedEventArgs e)
-		{
-			await viewModel.ExecuteBatchAsync();
-		}
+		private async void Run(object sender, RoutedEventArgs e) => await viewModel.ExecuteBatchAsync();
 
-		private void Stop(object sender, RoutedEventArgs e)
-		{
-			viewModel.CancelBatch();
-		}
+		private void Stop(object sender, RoutedEventArgs e) => viewModel.CancelBatch();
 
 		private void IsolatePar2(object sender, RoutedEventArgs e)
 		{
 			batchList.Select(".par2");
-			batchList.In
+			batchList.InvertSelection();
+			batchList.DeleteSelected();
+			batchList.Select(".vol");
+			batchList.DeleteSelected();
 		}
 
 		private void Selection_TextChanged(object sender, TextChangedEventArgs e)

@@ -20,30 +20,19 @@ namespace BatchExecute
 			Normal, Maximized, MinimizedNoFocus
 		}
 
-		public static List<Process> GetDirectChildProcesses(int id)
-		{
-			var list = new List<Process>();
-			Process[] procs = Process.GetProcesses();
-			foreach (Process p in procs)
-			{
-				if (GetParentProcess(p.Id) == id)
-				{
-					list.Add(p);
-				}
-			}
-			return list;
-		}
-
-		public static List<Process> GetChildProcesses(int id)
+		private static List<Process> GetChildProcesses(int id, IEnumerable<Tuple<int, Process>> allProcesses)
 		{
 			var output = new List<Process>();
-			var list = GetDirectChildProcesses(id);
-			//add direct children to output
-			output.AddRange(list);
-			foreach (Process p in list)
+			foreach (var process in allProcesses)
 			{
-				var children = GetChildProcesses(p.Id);
-				output.AddRange(children);
+				if (process.Item1 == id)
+				{
+					//add direct child to output
+					output.Add(process.Item2);
+					//recursion for child processes of child
+					var childPid = process.Item2.Id;
+					output.AddRange(GetChildProcesses(childPid, allProcesses));
+				}
 			}
 			return output;
 		}
@@ -73,7 +62,7 @@ namespace BatchExecute
 				{
 					WaitForIdleTime(process, idleTimeMsec, cancel);
 					//has been idle for longer than parameter idle time
-					if (closeAfterIdleTime)
+					if (!process.HasExited && closeAfterIdleTime)
 					{
 						//try to gracefully end process
 						if(!process.CloseMainWindow())
@@ -87,20 +76,20 @@ namespace BatchExecute
 
 		private static void WaitForIdleTime(Process process, int idleTimeMsec, Func<bool> cancel)
 		{
-			var processTree = GetChildProcesses(process.Id);
-			processTree.Add(process);
 			long TotalTicks()
 			{
-				processTree.ForEach((p) => p.Refresh());
+				//if you do this only once, wait some time after process start to assume children have been created
+				var allProcesses = from p in Process.GetProcesses() select new Tuple<int, Process>(GetParentProcess(p.Id), p);
+				var processTree = GetChildProcesses(process.Id, allProcesses); //this is time consuming (large enough polling interval), but process could father new child any time
+				processTree.Add(process);
 				return processTree.Sum((p) => p.HasExited ? 0 : p.TotalProcessorTime.Ticks);
 			}
 			//polling if process did anything
-			const int pollingInterval = 100;
+			const int pollingInterval = 500;
 			long lastTickCount = 0;
 			for (int idleTime = 0; idleTime < idleTimeMsec; idleTime += pollingInterval)
 			{
 				var newTickCount = TotalTicks();
-				//Debug.WriteLine(newTickCount);
 				//check if some processing has been done (any cpu ticks used) during polling interval
 				if (newTickCount > lastTickCount)
 				{
@@ -115,20 +104,18 @@ namespace BatchExecute
 
 		private static int GetParentProcess(int id)
 		{
-			int parentPid = 0;
 			try
 			{
-				using (ManagementObject mo = new ManagementObject("win32_process.handle='" + id.ToString() + "'"))
+				using (var mo = new ManagementObject("win32_process.handle='" + id.ToString() + "'"))
 				{
 					mo.Get();
-					parentPid = Convert.ToInt32(mo["ParentProcessId"]);
+					return Convert.ToInt32(mo["ParentProcessId"]);
 				}
 			}
 			catch
 			{
-				parentPid = 0;
+				return 0;
 			}
-			return parentPid;
 		}
 
 		private static Process Start(string fileName_, ProcessWindowStyle ws_)
