@@ -17,6 +17,7 @@
 		<CommandBinding Command="Open" Executed="OpenCommand_Executed" CanExecute="IsSomethingSelected" />
 		<CommandBinding Command="Paste" Executed="PasteCommand_Executed" CanExecute="PasteCommand_CanExecute" />
 		<CommandBinding Command="self:CustomCommands.RunAll" Executed="RunAllCommand_Executed" CanExecute="IsSomethingSelected" />
+		<CommandBinding Command="self:CustomCommands.DeleteSelected" Executed="DeleteSelectedCommand_Executed" CanExecute="IsSomethingSelected" />
 	</Window.CommandBindings>
 	<Window.InputBindings>
 		<!--<KeyBinding Gesture="F5" Command="{Binding ApplicationCommands.Open}"/>-->
@@ -83,6 +84,9 @@
 				</Button>
 				<Button Command="Paste">
 					<Image Source="/BatchExecute;component/Images/paste.png" />
+				</Button>
+				<Button Command="self:CustomCommands.DeleteSelected">
+					<Image Source="/BatchExecute;component/Images/DeleteTaskList.png" />
 				</Button>
 				<Separator/>
 				<Label>Select:</Label>

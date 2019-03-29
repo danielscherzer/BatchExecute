@@ -52,6 +52,20 @@ namespace BatchExecute
 			Clipboard.SetText(dataString.ToString());
 		}
 
+		private void DeleteSelectedCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			var listBox = e.Source as ListBox;
+			if (listBox is null) return;
+			var source = listBox.ItemsSource as IList<string>;
+			if (source is null) return;
+			do
+			{
+				var i = listBox.SelectedIndex;
+				if (-1 == i) break;
+				source.RemoveAt(i);
+			} while (true);
+		}
+
 		private void PasteCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			e.CanExecute = Clipboard.ContainsText();
