@@ -2,13 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace BatchExecute
 {
-	class BatchExecuteViewModel : INotifyPropertyChanged
+	class BatchExecuteViewModel : NotifyPropertyChanged
 	{
 		public BatchExecuteViewModel()
 		{
@@ -22,15 +21,9 @@ namespace BatchExecute
 		public ProcessRun.ProcessWindowStyle WindowStyle => (ProcessRun.ProcessWindowStyle)Settings.Default.WindowStyle;
 		public bool Run
 		{
-			get => running;
-			private set
-			{
-				running = value;
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Run)));
-			}
+			get => _running;
+			private set => SetNotify(ref _running, value);
 		}
-
-		public event PropertyChangedEventHandler PropertyChanged;
 
 		public IEnumerable<ProcessRun.ProcessWindowStyle> WindowStyles { get; }
 
@@ -76,6 +69,6 @@ namespace BatchExecute
 		internal void CancelBatch() => cancel = true;
 
 		private volatile bool cancel = false;
-		private bool running = false;
+		private bool _running = false;
 	}
 }
