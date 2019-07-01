@@ -1,24 +1,41 @@
-﻿using System.Windows;
+﻿using AutoUpdateViaGitHubRelease;
+using System.IO;
+using System.Reflection;
+using System.Windows;
 using System.Windows.Input;
 
 namespace BatchExecute
 {
-	class UpdateViewModel : Update
+	class UpdateViewModel : NotifyPropertyChanged
 	{
 		public UpdateViewModel()
 		{
-			_command = new DelegateCommand(_ => UpdateAndClose());
+			var update = new Update("danielScherzer", "BatchExecute", Assembly.GetExecutingAssembly(), Path.GetTempPath());
+			update.PropertyChanged += (s, a) => Available = update.Available;
+
+			void UpdateAndClose()
+			{
+				update.Install();
+				var app = Application.Current;
+				app.Shutdown();
+			}
+
+			_command = new DelegateCommand(_ => UpdateAndClose(), _ => Available);
 		}
 
-		private void UpdateAndClose()
+		private void SetAvailable()
 		{
-			Execute();
-			var app = Application.Current;
-			app.Shutdown();
+			Application.Current.Dispatcher.Invoke(() => 
+			{
+				Available = true;
+				_command.RaiseCanExecuteChanged();
+			});
 		}
 
+		public bool Available { get => _available; private set => SetNotify(ref _available, value, _ => _command.RaiseCanExecuteChanged()); }
 		public ICommand Command => _command;
 
+		private bool _available = false;
 		private readonly DelegateCommand _command;
 	}
 }

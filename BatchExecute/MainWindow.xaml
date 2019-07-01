@@ -20,7 +20,7 @@
 		<CommandBinding Command="self:CustomCommands.DeleteSelected" Executed="DeleteSelectedCommand_Executed" CanExecute="IsSomethingSelected" />
 	</Window.CommandBindings>
 	<Window.InputBindings>
-		<KeyBinding Gesture="Delete" Command="{Binding ApplicationCommands.Open}"/>
+		<!--<KeyBinding Gesture="Delete" Command="{Binding ApplicationCommands.Open}"/>-->
 	</Window.InputBindings>
 	<Window.Resources>
 		<BooleanToVisibilityConverter x:Key="BoolToVis" />
@@ -138,6 +138,7 @@
 				<ToolBar DockPanel.Dock="Top">
 					<Button Click="Redo">Redo</Button>
 					<Button Click="ClearDoneBatchFiles">Clear</Button>
+					<Label Content="{Binding DoneBatchFiles.Count, Mode=OneWay}" ContentStringFormat="Count:{0}"/>
 				</ToolBar>
 				<ListBox Grid.Row="1" SelectionMode="Extended" ItemsSource="{Binding DoneBatchFiles}">
 					<ListBox.ItemTemplate>

@@ -68,7 +68,6 @@
     </ApplicationDefinition>
     <Compile Include="DelegateCommand.cs" />
     <Compile Include="PropertyChangedExtension.cs" />
-    <Compile Include="Update.cs" />
     <Compile Include="UpdateViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -130,7 +129,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AutoUpdateViaGitHubRelease">
-      <Version>0.1.4</Version>
+      <Version>0.1.10</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
