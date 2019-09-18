@@ -13,7 +13,7 @@ See the [change log](CHANGELOG.md) for changes and road map.
 - Option to detect idle applications (no CPU ticks) and close them
 
 ## Errors and questions
-Please us the GitHub [Issue function](https://github.com/danielscherzer/AutoUpdateViaGitHubRelease/issues/new) to report errors or ask questions.
+Please us the GitHub [Issue function](https://github.com/danielscherzer/BatchExecute/issues/new) to report errors or ask questions.
 
 ## Contribute
 Check out the [contribution guidelines](CONTRIBUTING.md)
