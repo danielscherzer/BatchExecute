@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
+using Zenseless.Patterns;
 
 namespace BatchExecute
 {
