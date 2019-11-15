@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,6 +20,8 @@ namespace BatchExecute
 			InitializeComponent();
 			viewModel = new BatchExecuteViewModel();
 			DataContext = viewModel;
+			var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+			Title += $" {currentVersion}";
 		}
 
 		private BatchExecuteViewModel viewModel;

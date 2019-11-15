@@ -131,7 +131,7 @@
       <Version>0.1.10</Version>
     </PackageReference>
     <PackageReference Include="Zenseless.Patterns">
-      <Version>0.5.109</Version>
+      <Version>0.5.131</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
