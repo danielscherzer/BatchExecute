@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows;
@@ -22,6 +23,15 @@ namespace BatchExecute
 			DataContext = viewModel;
 			var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
 			Title += $" {currentVersion}";
+			var args = Environment.GetCommandLineArgs().Skip(1);
+			if (args.Any())
+			{
+				viewModel.BatchFiles.Clear();
+				foreach (var fileName in args)
+				{
+					viewModel.BatchFiles.Add(fileName);
+				}
+			}
 		}
 
 		private BatchExecuteViewModel viewModel;

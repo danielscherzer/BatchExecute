@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Zenseless.Patterns;
 
@@ -18,6 +17,7 @@ namespace BatchExecute
 			WindowStyles = Enum.GetValues(typeof(ProcessRun.ProcessWindowStyle)).Cast<ProcessRun.ProcessWindowStyle>();
 		}
 
+		//public DeleteSelectedCommand DeleteSelectedCommand { get; } = new DeleteSelectedCommand();
 		public ObservableCollection<string> BatchFiles { get; }
 		public ObservableCollection<string> DoneBatchFiles { get; }
 		public ProcessRun.ProcessWindowStyle WindowStyle => (ProcessRun.ProcessWindowStyle)Settings.Default.WindowStyle;

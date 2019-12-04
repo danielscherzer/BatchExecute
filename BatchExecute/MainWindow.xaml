@@ -13,11 +13,11 @@
 		Title="Batch Execute" Closing="Window_Closing" Icon="/BatchExecute;component/Images/runPerformance.png"
 		FocusManager.FocusedElement="{Binding ElementName=batchList}">
 	<Window.CommandBindings>
-		<CommandBinding Command="Cut" Executed="CutCommand_Executed" CanExecute="IsSomethingSelected" />
-		<CommandBinding Command="Open" Executed="OpenCommand_Executed" CanExecute="IsSomethingSelected" />
-		<CommandBinding Command="Paste" Executed="PasteCommand_Executed" CanExecute="PasteCommand_CanExecute" />
-		<CommandBinding Command="self:CustomCommands.RunAll" Executed="RunAllCommand_Executed" CanExecute="IsSomethingSelected" />
-		<CommandBinding Command="self:CustomCommands.DeleteSelected" Executed="DeleteSelectedCommand_Executed" CanExecute="IsSomethingSelected" />
+		<CommandBinding Command="Cut" Executed="CutCommand_Executed" CanExecute="IsSomethingSelected"/>
+		<CommandBinding Command="Open" Executed="OpenCommand_Executed" CanExecute="IsSomethingSelected"/>
+		<CommandBinding Command="Paste" Executed="PasteCommand_Executed" CanExecute="PasteCommand_CanExecute"/>
+		<CommandBinding Command="self:CustomCommands.RunAll" Executed="RunAllCommand_Executed" CanExecute="IsSomethingSelected"/>
+		<CommandBinding Command="self:CustomCommands.DeleteSelected" Executed="DeleteSelectedCommand_Executed" CanExecute="IsSomethingSelected"/>
 	</Window.CommandBindings>
 	<Window.InputBindings>
 		<!--<KeyBinding Gesture="Delete" Command="{Binding ApplicationCommands.Open}"/>-->
