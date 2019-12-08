@@ -11,7 +11,7 @@ namespace BatchExecute
 	{
 		public UpdateViewModel()
 		{
-			var update = new Update("danielScherzer", "BatchExecute", Assembly.GetExecutingAssembly(), Path.GetTempPath());
+			var update = new Update("danielScherzer", "BatchExecute", Assembly.GetExecutingAssembly());
 			update.PropertyChanged += (s, a) => Available = update.Available;
 
 			void UpdateAndClose()
