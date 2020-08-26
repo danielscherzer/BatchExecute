@@ -11,9 +11,9 @@ namespace BatchExecute
 	public class ProcessRun
 	{
 		[DllImport("user32.dll")]
-		public static extern bool SetForegroundWindow(IntPtr hWnd);
+		private static extern bool SetForegroundWindow(IntPtr hWnd);
 		[DllImport("user32.dll")]
-		public static extern IntPtr GetForegroundWindow();
+		private static extern IntPtr GetForegroundWindow();
 
 		public enum ProcessWindowStyle
 		{
