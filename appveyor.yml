@@ -23,7 +23,7 @@ build:
   verbosity: minimal              # MSBuild verbosity level
 
 artifacts:
-- path: BatchExecute\Bin\$(configuration)
+- path: src\Bin\$(configuration)
   name: BatchExecute
 
 deploy:
