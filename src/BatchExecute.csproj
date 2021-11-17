@@ -116,15 +116,10 @@
     <Resource Include="Images\Copy.png" />
     <Resource Include="Images\Cut.png" />
     <Resource Include="Images\Paste.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\FolderOpened.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\Run.png" />
     <Resource Include="Images\Stop.png" />
-  </ItemGroup>
-  <ItemGroup>
+    <Resource Include="Images\DeleteTaskList.png" />
     <Resource Include="Images\RunPerformance.png" />
   </ItemGroup>
   <ItemGroup>
@@ -146,9 +141,6 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\DeleteTaskList.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
