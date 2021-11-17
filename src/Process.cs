@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Management;
 using System.Runtime.InteropServices;
-using System.Threading;
 
 namespace BatchExecute
 {
@@ -65,7 +64,7 @@ namespace BatchExecute
 					if (!process.HasExited && closeAfterIdleTime)
 					{
 						//try to gracefully end process
-						if(!process.CloseMainWindow())
+						if (!process.CloseMainWindow())
 						{
 							process.Kill();
 						}
@@ -120,23 +119,17 @@ namespace BatchExecute
 
 		private static Process Start(string fileName_, ProcessWindowStyle ws_)
 		{
-			ProcessStartInfo psi = new ProcessStartInfo(fileName_)
+			ProcessStartInfo psi = new(fileName_)
 			{
 				RedirectStandardOutput = false,
 				UseShellExecute = true
 			};
-			switch (ws_)
+			psi.WindowStyle = ws_ switch
 			{
-				case ProcessWindowStyle.Maximized:
-					psi.WindowStyle = System.Diagnostics.ProcessWindowStyle.Maximized;
-					break;
-				case ProcessWindowStyle.MinimizedNoFocus:
-					psi.WindowStyle = System.Diagnostics.ProcessWindowStyle.Minimized;
-					break;
-				default:
-					psi.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
-					break;
-			}
+				ProcessWindowStyle.Maximized => System.Diagnostics.ProcessWindowStyle.Maximized,
+				ProcessWindowStyle.MinimizedNoFocus => System.Diagnostics.ProcessWindowStyle.Minimized,
+				_ => System.Diagnostics.ProcessWindowStyle.Normal,
+			};
 			try
 			{
 				IntPtr hwnd = GetForegroundWindow();

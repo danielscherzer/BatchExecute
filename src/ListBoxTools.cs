@@ -24,9 +24,9 @@ namespace BatchExecute
 			if (listBox is null) return;
 			var selected = new HashSet<object>(listBox.SelectedItems.Cast<string>());
 			listBox.SelectedItems.Clear();
-			foreach(var item in listBox.Items)
+			foreach (var item in listBox.Items)
 			{
-				if(!selected.Contains(item))
+				if (!selected.Contains(item))
 				{
 					listBox.SelectedItems.Add(item);
 				}
@@ -37,7 +37,7 @@ namespace BatchExecute
 		{
 			if (listBox is null) return;
 			listBox.SelectedItems.Clear();
-			foreach(var item in listBox.Items)
+			foreach (var item in listBox.Items)
 			{
 				if (item.ToString().Contains(sSelect))
 				{

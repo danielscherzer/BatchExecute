@@ -5,7 +5,7 @@ using System.Windows.Input;
 
 namespace BatchExecute
 {
-	class DeleteSelectedCommand : ICommand
+	internal class DeleteSelectedCommand : ICommand
 	{
 		public event EventHandler CanExecuteChanged
 		{

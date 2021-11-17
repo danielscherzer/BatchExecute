@@ -34,7 +34,7 @@ namespace BatchExecute
 			}
 		}
 
-		private BatchExecuteViewModel viewModel;
+		private readonly BatchExecuteViewModel viewModel;
 
 		private void IsSomethingSelected(object sender, CanExecuteRoutedEventArgs e)
 		{
@@ -49,10 +49,8 @@ namespace BatchExecute
 
 		private void CutCommand_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			var listBox = e.Source as ListBox;
-			if (listBox is null) return;
-			var source = listBox.ItemsSource as IList<string>;
-			if (source is null) return;
+			if (e.Source is not ListBox listBox) return;
+			if (listBox.ItemsSource is not IList<string> source) return;
 			var dataString = new StringBuilder();
 			do
 			{
@@ -66,10 +64,8 @@ namespace BatchExecute
 
 		private void DeleteSelectedCommand_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			var listBox = e.Source as ListBox;
-			if (listBox is null) return;
-			var source = listBox.ItemsSource as IList<string>;
-			if (source is null) return;
+			if (e.Source is not ListBox listBox) return;
+			if (listBox.ItemsSource is not IList<string> source) return;
 			do
 			{
 				var i = listBox.SelectedIndex;
@@ -78,10 +74,7 @@ namespace BatchExecute
 			} while (true);
 		}
 
-		private void PasteCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-		{
-			e.CanExecute = Clipboard.ContainsText();
-		}
+		private void PasteCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = Clipboard.ContainsText();
 
 		private void PasteCommand_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
@@ -92,7 +85,7 @@ namespace BatchExecute
 			var dataString = Clipboard.GetText();
 			var lines = dataString.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
 			var index = listBox.SelectedIndex + 1;
-			foreach(var line in lines)
+			foreach (var line in lines)
 			{
 				source.Insert(index, line.Trim());
 				index++;
@@ -101,16 +94,14 @@ namespace BatchExecute
 
 		private void OpenCommand_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			var listBox = e.Source as ListBox;
-			if (listBox is null) return;
-			var source = listBox.ItemsSource as IList<string>;
-			if (source is null) return;
+			if (e.Source is not ListBox listBox) return;
+			if (listBox.ItemsSource is not IList<string>) return;
 			foreach (var item in listBox.SelectedItems)
 			{
 				string path = Path.GetDirectoryName(item.ToString());
 				if (Directory.Exists(path))
 				{
-					Process.Start("explorer.exe", '"' + path + '"');
+					_ = Process.Start("explorer.exe", '"' + path + '"');
 				}
 			}
 		}
@@ -123,7 +114,7 @@ namespace BatchExecute
 			if (source is null) return;
 			foreach (var item in listBox.SelectedItems)
 			{
-				ProcessRun.Run(item.ToString(), viewModel.WindowStyle);
+				ProcessRun.Run(item.ToString(), BatchExecuteViewModel.WindowStyle);
 			}
 		}
 
@@ -133,7 +124,7 @@ namespace BatchExecute
 
 		private void File_Drop(object sender, DragEventArgs e)
 		{
-			var fileNames = (string[])e.Data.GetData(DataFormats.FileDrop);
+			string[] fileNames = (string[])e.Data.GetData(DataFormats.FileDrop);
 			foreach (var fileName in fileNames)
 			{
 				viewModel.BatchFiles.Add(fileName);
@@ -159,8 +150,7 @@ namespace BatchExecute
 
 		private void Selection_TextChanged(object sender, TextChangedEventArgs e)
 		{
-			var textBox = sender as TextBox;
-			if (textBox is null) return;
+			if (sender is not TextBox textBox) return;
 			batchList.Select(textBox.Text);
 		}
 	}

@@ -10,7 +10,7 @@
 		Width="{Binding Source={x:Static p:Settings.Default}, Path=Width, Mode=TwoWay}"
 		Left="{Binding Source={x:Static p:Settings.Default}, Path=Left, Mode=TwoWay}"
 		Top="{Binding Source={x:Static p:Settings.Default}, Path=Top, Mode=TwoWay}"
-		Title="Batch Execute" Closing="Window_Closing" Icon="/BatchExecute;component/Images/runPerformance.png"
+		Title="Batch Execute" Closing="Window_Closing" Icon="/BatchExecute;component/icons/runPerformance.png"
 		FocusManager.FocusedElement="{Binding ElementName=batchList}">
 	<Window.CommandBindings>
 		<CommandBinding Command="Cut" Executed="CutCommand_Executed" CanExecute="IsSomethingSelected"/>
@@ -50,10 +50,10 @@
 					<Image>
 						<Image.Style>
 							<Style TargetType="{x:Type Image}" BasedOn="{StaticResource {x:Type Image}}">
-								<Setter Property="Source" Value="/BatchExecute;component/Images/runPerformance.png" />
+								<Setter Property="Source" Value="/BatchExecute;component/icons/runPerformance.png" />
 								<Style.Triggers>
 									<DataTrigger Binding="{Binding ElementName=run, Path=IsChecked}" Value="True">
-										<Setter Property="Source" Value="/BatchExecute;component/Images/stop.png" />
+										<Setter Property="Source" Value="/BatchExecute;component/icons/stop.png" />
 									</DataTrigger>
 								</Style.Triggers>
 							</Style>
@@ -78,19 +78,19 @@
 			<!-- Commands -->
 			<ToolBar>
 				<Button Command="self:CustomCommands.RunAll">
-					<Image Source="/BatchExecute;component/Images/run.png" />
+					<Image Source="/BatchExecute;component/icons/run.png" />
 				</Button>
 				<Button Command="Open">
-					<Image Source="/BatchExecute;component/Images/folderOpened.png" />
+					<Image Source="/BatchExecute;component/icons/folderOpened.png" />
 				</Button>
 				<Button Command="Cut">
-					<Image Source="/BatchExecute;component/Images/cut.png" />
+					<Image Source="/BatchExecute;component/icons/cut.png" />
 				</Button>
 				<Button Command="Paste">
-					<Image Source="/BatchExecute;component/Images/paste.png" />
+					<Image Source="/BatchExecute;component/icons/paste.png" />
 				</Button>
 				<Button Command="self:CustomCommands.DeleteSelected">
-					<Image Source="/BatchExecute;component/Images/DeleteTaskList.png" />
+					<Image Source="/BatchExecute;component/icons/DeleteTaskList.png" />
 				</Button>
 				<Separator/>
 				<Label>Select:</Label>

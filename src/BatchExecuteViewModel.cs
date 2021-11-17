@@ -8,7 +8,7 @@ using Zenseless.Patterns;
 
 namespace BatchExecute
 {
-	class BatchExecuteViewModel : NotifyPropertyChanged
+	internal class BatchExecuteViewModel : NotifyPropertyChanged
 	{
 		public BatchExecuteViewModel()
 		{
@@ -19,12 +19,15 @@ namespace BatchExecute
 
 		//public DeleteSelectedCommand DeleteSelectedCommand { get; } = new DeleteSelectedCommand();
 		public ObservableCollection<string> BatchFiles { get; }
+
 		public ObservableCollection<string> DoneBatchFiles { get; }
-		public ProcessRun.ProcessWindowStyle WindowStyle => (ProcessRun.ProcessWindowStyle)Settings.Default.WindowStyle;
+
+		public static ProcessRun.ProcessWindowStyle WindowStyle => (ProcessRun.ProcessWindowStyle)Settings.Default.WindowStyle;
+
 		public bool Run
 		{
 			get => _running;
-			private set => SetNotify(ref _running, value);
+			private set => Set(ref _running, value);
 		}
 
 		public IEnumerable<ProcessRun.ProcessWindowStyle> WindowStyles { get; }
@@ -51,7 +54,7 @@ namespace BatchExecute
 		{
 			cancel = false;
 			Run = true;
-			while(BatchFiles.Count > 0)
+			while (BatchFiles.Count > 0)
 			{
 				var file = BatchFiles[0];
 				await Task.Run(() =>

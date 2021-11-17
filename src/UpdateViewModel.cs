@@ -7,16 +7,19 @@ using Zenseless.Patterns;
 
 namespace BatchExecute
 {
-	class UpdateViewModel : NotifyPropertyChanged
+	internal class UpdateViewModel : NotifyPropertyChanged
 	{
 		public UpdateViewModel()
 		{
-			var update = new Update("danielScherzer", "BatchExecute", Assembly.GetExecutingAssembly());
+			var update = new Update();
 			update.PropertyChanged += (s, a) => Available = update.Available;
+			var assembly = Assembly.GetExecutingAssembly();
+			update.CheckDownloadNewVersionAsync("danielScherzer", "BatchExecute", assembly.GetName().Version, Path.GetTempPath());
+
 
 			void UpdateAndClose()
 			{
-				update.Install();
+				update.StartInstall(Path.GetDirectoryName(assembly.Location));
 				var app = Application.Current;
 				app.Shutdown();
 			}
@@ -24,16 +27,7 @@ namespace BatchExecute
 			_command = new DelegateCommand(_ => UpdateAndClose(), _ => Available);
 		}
 
-		private void SetAvailable()
-		{
-			Application.Current.Dispatcher.Invoke(() => 
-			{
-				Available = true;
-				_command.RaiseCanExecuteChanged();
-			});
-		}
-
-		public bool Available { get => _available; private set => SetNotify(ref _available, value, _ => _command.RaiseCanExecuteChanged()); }
+		public bool Available { get => _available; private set => Set(ref _available, value, _ => _command.RaiseCanExecuteChanged()); }
 		public ICommand Command => _command;
 
 		private bool _available = false;
