@@ -27,6 +27,6 @@ namespace BatchExecute
 
 		public void Execute(object parameter) => _execute(parameter);
 
-		public void RaiseCanExecuteChanged() => CommandManager.InvalidateRequerySuggested();
+		public static void RaiseCanExecuteChanged() => CommandManager.InvalidateRequerySuggested();
 	}
 }
