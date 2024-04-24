@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <Version>0.2</Version>
     <Authors>Daniel Scherzer</Authors>
@@ -30,9 +30,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoUpdateViaGitHubRelease" Version="0.1.63" />
-    <PackageReference Include="System.Management" Version="7.0.0" />
-    <PackageReference Include="Zenseless.Patterns" Version="0.6.23" />
+    <PackageReference Include="AutoUpdateViaGitHubRelease" Version="0.1.64" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
+    <PackageReference Include="Zenseless.Patterns" Version="0.6.35" />
   </ItemGroup>
   
 </Project>
